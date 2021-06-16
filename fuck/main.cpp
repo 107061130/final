@@ -21,7 +21,7 @@ int now;
 int re = 1;
 
 void Follow();
-parallax_ping  ping1(pin10);
+
 int main(){
     xbee.set_baud(9600);
    char recv[1];
@@ -63,6 +63,11 @@ void Follow(){
     int turn = 0;
     float r;
     bool stop = false;
+    char buff[25];
+    int task = 0;
+    sprintf(buff, "FIRST STOP\r\n");
+    xbee.write(buff, 12);
+    
     while(1){
         re = 0;
         //printf("%s\n", recvall);
@@ -116,13 +121,13 @@ void Follow(){
 
         if (abs(dx) + abs(dy) > 0) {
             if (x1 < 70) {
-                car.turn(30, 1);
+                car.turn(25, 1);
                 printf("Right\n");
                 ThisThread::sleep_for(50ms);
                 car.stop();
             }
             else if (x1 > 90) {
-                car.turn(-30, 1);
+                car.turn(-25, 1);
                 printf("LEFT\n");
                 ThisThread::sleep_for(50ms);
                 car.stop();
@@ -132,43 +137,55 @@ void Follow(){
             }
 
             if (tz >= -4 && tz != 0) {
-                printf("start\n");
-                car.goStraight(100);
-                ThisThread::sleep_for(1500ms);
+                if (task == 0) {
+                    sprintf(buff, "SECOND STOP\r\n");
+                    xbee.write(buff, 13);
+                    car.goStraight(100);
+                    ThisThread::sleep_for(1500ms);
                 
-                car.stop();
-                ThisThread::sleep_for(1000ms);
+                    car.stop();
+                    ThisThread::sleep_for(1000ms);
 
-                car.turn(-100, 1);
-                ThisThread::sleep_for(630ms);
+                    car.turn(-100, 1);
+                    ThisThread::sleep_for(630ms);
 
-                car.goStraight(100);
-                ThisThread::sleep_for(2000ms);
+                    car.goStraight(100);
+                    ThisThread::sleep_for(2500ms);
 
-                car.stop();
-                ThisThread::sleep_for(1000ms);
+                    car.stop();
+                    ThisThread::sleep_for(1000ms);
 
-                car.turn(100, 1);
-                ThisThread::sleep_for(680ms);
+                    car.turn(100, 1);
+                    ThisThread::sleep_for(680ms);
 
-                car.goStraight(100);
-                ThisThread::sleep_for(3000ms);
+                    car.goStraight(100);
+                    ThisThread::sleep_for(3500ms);
 
-                car.stop();
-                ThisThread::sleep_for(1000ms);
+                    car.stop();
+                    ThisThread::sleep_for(1000ms);
 
-                car.turn(100, 1);
-                ThisThread::sleep_for(1000ms);
+                    car.turn(100, 1);
+                    ThisThread::sleep_for(1000ms);
 
-                car.goStraight(1000);
-                ThisThread::sleep_for(1100ms);
+                    car.goStraight(1000);
+                    ThisThread::sleep_for(1300ms);
 
-                car.stop();
-                ThisThread::sleep_for(1000ms);
+                    car.stop();
+                    ThisThread::sleep_for(1000ms);
 
-                car.turn(-100, 1);
-                ThisThread::sleep_for(480ms);
-                printf("detect line\n");
+                    car.turn(-100, 1);
+                    ThisThread::sleep_for(450ms);
+                    printf("detect line\n");
+                    task = 1;
+                    sprintf(buff, "END1\r\n");
+                    xbee.write(buff, 6);
+                } else if (task == 1){
+                    car.stop();
+                    ThisThread::sleep_for(1000ms);
+                    sprintf(buff, "END2\r\n");
+                    xbee.write(buff, 6);
+                    task++;
+                }
             }
             
         }
