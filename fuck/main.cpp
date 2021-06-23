@@ -102,6 +102,13 @@ void Follow(){
                 y1 = atoi(n[1]);
                 x2 = atoi(n[2]);
                 y2 = atoi(n[3]);
+                if (y1 > y2) {
+                    int temp;
+                    temp = x1;
+                    x1 = x2;
+                    x2 = temp;
+                }
+
                 printf("%d %d %d %d\n", x1, y1, x2 ,y2);
             }
         }
